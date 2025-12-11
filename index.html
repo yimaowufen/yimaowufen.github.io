@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重症医学科之持续肾脏替代治疗系列</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+        }
+        body {
+            background-color: #f0f8fb; /* 柔和医疗背景色 */
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden; /* 禁止横向滚动 */
+        }
+        /* 表头核心优化： */
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: flex-end; /* 整体垂直靠下对齐 */
+            justify-content: space-between; /* 两端对齐 */
+            flex-wrap: nowrap; /* 禁止换行 */
+            gap: 12px; /* LOGO与标题间距 */
+            min-height: 70px; /* 固定表头最小高度 */
+        }
+        .logo {
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0; /* LOGO不压缩 */
+            margin-bottom: 2px; /* 微调LOGO位置 */
+        }
+        /* 标题容器：垂直居中 */
+        .title-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* 标题自身垂直居中 */
+            flex: 1; /* 占满中间空间 */
+            min-width: 0; /* 允许文字溢出省略 */
+        }
+        .main-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sub-title {
+            font-size: 12px;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* 靠右+紧贴表头底部 */
+        .acknowledgement {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* 文字右对齐 */
+            min-width: 150px; /* 固定最小宽度 */
+            font-size: 11px;
+            padding: 0;
+            margin: 0;
+            margin-bottom: 2px; /* 紧贴表头底部，2px间距 */
+        }
+        .designer {
+            margin-top: 1px; /* 缩小行间距，更紧凑靠下 */
+            white-space: nowrap;
+        }
+        .container {
+            max-width: 100%;
+            margin: 15px auto;
+            padding: 0 15px;
+        }
+        .patient-info, .function-module {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: visible;
+        }
+        .section-title {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+        }
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .form-item {
+            flex: 1;
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #444;
+            font-size: 13px;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            transition: border-color 0.3s;
+            width: 100%;
+        }
+        /* 启用原生下拉框 */
+        select {
+            background-color: white;
+            appearance: menulist;
+            -webkit-appearance: menulist;
+            -moz-appearance: menulist;
+            border: 1px solid #ddd;
+            padding-right: 25px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 12px 0;
+            padding: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-break: break-all;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .result-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        .result-content {
+            line-height: 1.7;
+        }
+        .alert {
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .alert-info {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-reset {
+            background-color: #95a5a6;
+        }
+        .btn-reset:hover {
+            background-color: #7f8c8d;
+        }
+        /* 功能四专属样式（匹配整体风格） */
+        .result {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        /* 移动端适配： */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 12px;
+                gap: 8px;
+                align-items: flex-end; /* 保持垂直靠下 */
+                min-height: 65px;
+            }
+            .logo {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+                margin-bottom: 1px;
+            }
+            .main-title {
+                font-size: 15px;
+            }
+            .sub-title {
+                font-size: 11px;
+            }
+            .acknowledgement {
+                min-width: 120px;
+                font-size: 10px;
+                margin-bottom: 1px; /* 移动端紧贴底部 */
+                margin-left: auto; /* 强制靠右 */
+            }
+            .designer {
+                margin-top: 1px;
+            }
+        }
+        /* 超小屏适配 */
+        @media (max-width: 375px) {
+            .acknowledgement {
+                min-width: auto;
+                max-width: 120px;
+                font-size: 9px; /* 缩小字体，避免换行 */
+            }
+            .main-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部区域：LOGO靠左 + 标题紧跟 + 鸣谢靠右且贴近表头下方 -->
+    <div class="header">
+        <div class="logo">🏥</div> <!-- LOGO靠左，微调位置与鸣谢对齐 -->
+        <div class="title-container"> <!-- 标题自身垂直居中 -->
+            <div class="main-title">如皋市人民医院--重症医学科</div>
+            <div class="sub-title">持续肾脏替代治疗系列</div>
+        </div>
+        <div class="acknowledgement"> <!-- 紧贴表头底部 -->
+           <div class="designer">Designer: 一毛五分</div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <!-- 患者基本信息 -->
+        <div class="patient-info">
+            <div class="section-title">患者基本信息</div>
+            <div class="form-group">
+                <div class="form-item">
+                    <label for="age">年龄（岁）</label>
+                    <input type="number" id="age" min="0" max="120" placeholder="请输入年龄">
+                </div>
+                <div class="form-item">
+                    <label for="gender">性别</label>
+                    <select id="gender">
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label for="weight">体重（kg）</label>
+                    <input type="number" id="weight" min="0" max="200" step="0.1" placeholder="请输入体重">
+                </div>
+                <div class="form-item">
+                    <label for="hct">红细胞压积（%）</label>
+                    <input type="number" id="hct" min="0" max="100" step="0.1" placeholder="请输入红细胞压积">
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能一：AKI分级诊断 -->
+        <div class="function-module">
+            <div class="section-title">功能一：AKI分级诊断（KDIGO标准）</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>AKI分级</th>
+                            <th>血清肌酐（Scr）标准</th>
+                            <th>尿量标准（排除脱水/梗阻等因素）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1级</td>
+                            <td>SCr升高至基线值的1.5-1.9倍，或绝对值增加≥26.5μmol/L</td>
+                            <td>尿量<0.5ml/(kg·h)，持续6-12小时</td>
+                        </tr>
+                        <tr>
+                            <td>2级</td>
+                            <td>SCr升高至基线值的2.0-2.9倍</td>
+                            <td>尿量<0.5ml/(kg·h)，持续≥12小时</td>
+                        </tr>
+                        <tr>
+                            <td>3级</td>
+                            <td>SCr升高至基线值的3.0倍或以上，或SCr≥353.6μmol/L，或开始肾脏替代治疗</td>
+                            <td>尿量<0.3ml/(kg·h)，持续≥24小时；或无尿持续≥12小时</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-group">
+                <div class="form-item">
+                    <label for="scr-baseline">肌酐基线值（μmol/L）</label>
+                    <input type="number" id="scr-baseline" min="0" step="0.1" placeholder="请输入基线肌酐">
+                </div>
+                <div class="form-item">
+                    <label for="scr-monitor">监测肌酐值（μmol/L）</label>
+                    <input type="number" id="scr-monitor" min="0" step="0.1" placeholder="请输入监测肌酐">
+                </div>
+                <div class="form-item">
+                    <label for="urine-time">尿量持续时间（小时）</label>
+                    <input type="number" id="urine-time" min="0" step="0.1" placeholder="请输入持续时间">
+                </div>
+                <div class="form-item">
+                    <label for="urine-volume">总尿量（ml）</label>
+                    <input type="number" id="urine-volume" min="0" step="0.1" placeholder="请输入总尿量">
+                </div>
+            </div>
+            <button class="btn" onclick="calculateAKI()">计算AKI分级</button>
+            <button class="btn btn-reset" onclick="resetAKI()">重置</button>
+            <div class="result-card" id="aki-result" style="display: none;">
+                <div class="result-title">计算结果</div>
+                <div class="result-content" id="aki-result-content"></div>
+            </div>
+        </div>
+
+        <!-- 功能二：CRRT置换液配方计算 -->
+        <div class="function-module">
+            <div class="section-title">功能二：CRRT置换液配方计算</div>
+            <div class="alert alert-info">
+                提示：注意置换液各成分的实际浓度（%），如与设置值不符，请换算后输入！
+            </div>
+            <div class="form-group">
+                <div class="form-item">
+                    <label for="nacl-09">0.9%氯化钠（ml）</label>
+                    <input type="number" id="nacl-09" min="0" step="1" placeholder="请输入用量">
+                </div>
+                <div class="form-item">
+                    <label for="water">灭菌注射用水（ml）</label>
+                    <input type="number" id="water" min="0" step="1" placeholder="请输入用量">
+                </div>
+                <div class="form-item">
+                    <label for="kcl-10">10%氯化钾（ml）</label>
+                    <input type="number" id="kcl-10" min="0" step="0.1" placeholder="请输入用量">
+                </div>
+                <div class="form-item">
+                    <label for="nacl-10">10%氯化钠（ml）</label>
+                    <input type="number" id="nacl-10" min="0" step="0.1" placeholder="请输入用量">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-item">
+                    <label for="nahco3-5">5%碳酸氢钠（ml）</label>
+                    <input type="number" id="nahco3-5" min="0" step="1" placeholder="请输入用量">
+                </div>
+                <div class="form-item">
+                    <label for="ca-gluconate-10">10%葡萄糖酸钙（ml）</label>
+                    <input type="number" id="ca-gluconate-10" min="0" step="0.1" placeholder="请输入用量">
+                </div>
+                <div class="form-item">
+                    <label for="mgso4-25">25%MgSO₄·7H₂O（ml）</label>
+                    <input type="number" id="mgso4-25" min="0" step="0.1" placeholder="请输入用量">
+                </div>
+                <div class="form-item">
+                    <label for="glucose-50">50%葡萄糖（ml）</label>
+                    <input type="number" id="glucose-50" min="0" step="0.1" placeholder="请输入用量">
+                </div>
+            </div>
+            <button class="btn" onclick="calculateReplacement()">计算置换液参数</button>
+            <button class="btn btn-reset" onclick="resetReplacement()">重置</button>
+            <div class="result-card" id="replacement-result" style="display: none;">
+                <div class="result-title">置换液计算结果</div>
+                <div class="result-content" id="replacement-result-content"></div>
+            </div>
+        </div>
+
+        <!-- 功能三：CRRT处方参数计算 -->
+        <div class="function-module">
+            <div class="section-title">功能三：CRRT处方参数计算</div>
+            <div class="form-group">
+                <div class="form-item">
+                    <label for="crrt-mode">CRRT模式</label>
+                    <select id="crrt-mode">
+                        <option value="">请选择</option>
+                        <option value="CVVH">CVVH（连续性静脉-静脉血液滤过）</option>
+                        <option value="CVVHD">CVVHD（连续性静脉-静脉血液透析）</option>
+                        <option value="CVVHDF">CVVHDF（连续性静脉-静脉血液透析滤过）</option>
+                        <option value="SCUF">SCUF（缓慢连续性超滤）</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label for="blood-flow">血流速（ml/min）</label>
+                    <input type="number" id="blood-flow" min="0" step="1" placeholder="请输入血流速">
+                </div>
+                <div class="form-item">
+                    <label for="pre-dilution">前稀释用量（ml/h）</label>
+                    <input type="number" id="pre-dilution" min="0" step="1" placeholder="请输入前稀释用量">
+                </div>
+                <div class="form-item">
+                    <label for="post-dilution">后稀释用量（ml/h）</label>
+                    <input type="number" id="post-dilution" min="0" step="1" placeholder="请输入后稀释用量">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-item">
+                    <label for="dialysate-flow">透析液用量（ml/h）</label>
+                    <input type="number" id="dialysate-flow" min="0" step="1" placeholder="请输入透析液用量">
+                </div>
+                <div class="form-item">
+                    <label for="fluid-balance">液体平衡（ml）</label>
+                    <input type="number" id="fluid-balance" step="1" placeholder="正平衡为正，负平衡为负">
+                </div>
+            </div>
+            <div class="alert alert-info">
+                参考标准：肾脏替代超滤率：20-25ml/kg/h，重症患者超滤率：30-35ml/kg/h，重症感染超滤率：40ml/kg/h，滤过分数＜30%
+            </div>
+            <button class="btn" onclick="calculateCRRTParams()">计算UFR和FF</button>
+            <button class="btn btn-reset" onclick="resetCRRTParams()">重置</button>
+            <div class="result-card" id="crrt-params-result" style="display: none;">
+                <div class="result-title">CRRT参数计算结果</div>
+                <div class="result-content" id="crrt-params-result-content"></div>
+            </div>
+        </div>
+
+        <!-- 功能四：CRRT处方优化计算 -->
+        <div class="function-module">
+            <div class="section-title">功能四：CRRT处方优化计算</div>
+            <div class="form-group">
+                <div class="form-item">
+                    <label for="target-ufr">目标超滤率（ml/kg/h）</label>
+                    <input type="number" id="target-ufr" min="0" step="0.1" placeholder="请输入目标UFR">
+                </div>
+                <div class="form-item">
+                    <label for="total-replacement">置换液总量（ml/h）</label>
+                    <input type="number" id="total-replacement" min="0" step="1" placeholder="前稀释+后稀释总量">
+                </div>
+                <div class="form-item">
+                    <label for="blood-flow-opt">血流速（ml/min）</label>
+                    <input type="number" id="blood-flow-opt" min="0" step="1" placeholder="请输入血流速">
+                </div>
+                <div class="form-item">
+                    <label for="fluid-balance-opt">液体平衡（ml/h）</label>
+                    <input type="number" id="fluid-balance-opt" step="1" placeholder="正平衡为正，负平衡为负">
+                </div>
+            </div>
+            <button class="btn" onclick="optimizeCRRT()">计算优化处方</button>
+            <button class="btn btn-reset" onclick="resetOptimizeCRRT()">重置</button>
+            <div class="result-card" id="optimize-result" style="display: none;">
+                <div class="result-title">CRRT处方优化结果</div>
+                <div class="result-content" id="optimize-result-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取输入值（处理空值）
+        function getInputValue(id) {
+            const value = document.getElementById(id).value.trim();
+            return value ? parseFloat(value) : null;
+        }
+
+        // 功能一：AKI分级计算
+        function calculateAKI() {
+            const scrBaseline = getInputValue('scr-baseline');
+            const scrMonitor = getInputValue('scr-monitor');
+            const urineTime = getInputValue('urine-time');
+            const urineVolume = getInputValue('urine-volume');
+            const weight = getInputValue('weight');
+            const age = getInputValue('age');
+            const gender = document.getElementById('gender').value;
+            const resultEl = document.getElementById('aki-result');
+            const contentEl = document.getElementById('aki-result-content');
+
+            if (!scrBaseline || !scrMonitor || !urineTime || !urineVolume || !weight || !age || !gender) {
+                contentEl.innerHTML = '请完善所有输入参数！';
+                resultEl.style.display = 'block';
+                return;
+            }
+
+            // 分级逻辑：按KDIGO标准，"或"关系独立判定
+            const scrRatio = scrMonitor / scrBaseline;
+            const scrIncrease = scrMonitor - scrBaseline;
+            let scrGrade = '无';
+            if (scrRatio >= 3.0 || scrMonitor >= 353.6) {
+                scrGrade = '3级'; // 3倍以上或≥353.6μmol/L → 3级
+            } else if (scrRatio >= 2.0 && scrRatio < 3.0) {
+                scrGrade = '2级'; // 2.0-2.9倍 → 2级
+            } else if (scrRatio >= 1.5 && scrRatio < 2.0 || scrIncrease >= 26.5) {
+                scrGrade = '1级'; // 1.5-1.9倍 或 绝对值≥26.5μmol/L → 1级（或关系）
+            }
+
+            const urineRate = urineVolume / (weight * urineTime);
+            let urineGrade = '无';
+            if (urineRate < 0.5 && urineTime >= 6 && urineTime < 12) urineGrade = '1级';
+            else if (urineRate < 0.5 && urineTime >= 12) urineGrade = '2级';
+            else if ((urineRate < 0.3 && urineTime >= 24) || (urineVolume === 0 && urineTime >= 12)) urineGrade = '3级';
+
+            // 分级判定
+            let finalGrade;
+            if (scrGrade === '无' && urineGrade === '无') {
+                finalGrade = '未达到AKI诊断标准';
+            } else if (scrGrade === '无') {
+                finalGrade = urineGrade;
+            } else if (urineGrade === '无') {
+                finalGrade = scrGrade;
+            } else {
+                const gradeMap = { '1级': 1, '2级': 2, '3级': 3 };
+                finalGrade = gradeMap[scrGrade] >= gradeMap[urineGrade] ? scrGrade : urineGrade;
+            }
+
+            // 肌酐清除率计算（临床常用Cockcroft-Gault公式，肌酐单位μmol/L转换为mg/dL）
+            const scrMgDl = scrMonitor / 88.4; // μmol/L → mg/dL（1mg/dL=88.4μmol/L）
+            let crCl;
+            if (gender === 'male') {
+                // 男性：CRCL = (140 - 年龄) × 体重(kg) / (72 × 血肌酐(mg/dL))
+                crCl = (140 - age) * weight / (72 * scrMgDl);
+            } else {
+                // 女性：CRCL = (140 - 年龄) × 体重(kg) / (72 × 血肌酐(mg/dL)) × 0.85
+                crCl = (140 - age) * weight / (72 * scrMgDl) * 0.85;
+            }
+            crCl = crCl.toFixed(1); // 保留1位小数
+
+            // 输出结果
+            let basis = `<p>1. 肌酐评估：基线${scrBaseline}μmol/L，监测${scrMonitor}μmol/L，为基线的${scrRatio.toFixed(2)}倍，增加${scrIncrease.toFixed(1)}μmol/L → 符合${scrGrade}标准</p>`;
+            basis += `<p>2. 尿量评估：${urineTime}小时尿量${urineVolume}ml，尿量率${urineRate.toFixed(2)}ml/(kg·h) → 符合${urineGrade}标准</p>`;
+            basis += `<p>3. 肌酐清除率（Cockcroft-Gault公式）：${crCl} ml/min</p>`;
+            basis += `<p><strong>最终AKI分级：${finalGrade}</strong>（KDIGO标准）</p>`;
+
+            contentEl.innerHTML = basis;
+            resultEl.style.display = 'block';
+        }
+
+        function resetAKI() {
+            document.getElementById('scr-baseline').value = '';
+            document.getElementById('scr-monitor').value = '';
+            document.getElementById('urine-time').value = '';
+            document.getElementById('urine-volume').value = '';
+            document.getElementById('aki-result').style.display = 'none';
+        }
+
+        // 功能二：置换液配方计算
+        function calculateReplacement() {
+            const nacl09 = getInputValue('nacl-09') || 0;
+            const water = getInputValue('water') || 0;
+            const kcl10 = getInputValue('kcl-10') || 0;
+            const nacl10 = getInputValue('nacl-10') || 0;
+            const nahco35 = getInputValue('nahco3-5') || 0;
+            const caGluconate10 = getInputValue('ca-gluconate-10') || 0;
+            const mgso425 = getInputValue('mgso4-25') || 0;
+            const glucose50 = getInputValue('glucose-50') || 0;
+
+            const resultEl = document.getElementById('replacement-result');
+            const contentEl = document.getElementById('replacement-result-content');
+
+            const totalVolume = (nacl09 + water + kcl10 + nacl10 + nahco35 + caGluconate10 + mgso425 + glucose50) / 1000;
+            if (totalVolume === 0) {
+                contentEl.innerHTML = '请至少输入一种成分的用量！';
+                resultEl.style.display = 'block';
+                return;
+            }
+
+            const kclMass = kcl10 * 0.1;
+            const nacl09Mass = nacl09 * 0.009;
+            const nacl10Mass = nacl10 * 0.1;
+            const nahco35Mass = nahco35 * 0.05;
+            const mgso4Mass = mgso425 * 0.25;
+            const glucoseMass = glucose50 * 0.5;
+
+            const kConcentration = (kclMass * 13.4) / totalVolume;
+            const naConcentration = (nacl09Mass * 17.1 + nacl10Mass * 17.1 + nahco35Mass * 11.9) / totalVolume;
+            const caConcentration = (caGluconate10 * 0.1 * 2.25) / totalVolume;
+            const mgConcentration = (mgso4Mass * 4.04) / totalVolume;
+            const HCO3Concentration = (nahco35Mass * 11.9) / totalVolume;
+            const glucoseConcentration = (glucoseMass * 5.56) / totalVolume;
+
+            let result = `<p><strong>置换液总体积：${totalVolume.toFixed(2)} L</strong></p>`;
+            result += `<p>离子浓度：</p>`;
+            result += `<ul>`;
+            result += `<li>钠离子：${naConcentration.toFixed(1)} mmol/L</li>`;
+            result += `<li>钾离子：${kConcentration.toFixed(1)} mmol/L</li>`;
+            result += `<li>钙离子：${caConcentration.toFixed(1)} mmol/L</li>`;
+            result += `<li>镁离子：${mgConcentration.toFixed(1)} mmol/L</li>`;
+            result += `<li>碳酸氢根离子：${HCO3Concentration.toFixed(1)} mmol/L</li>`;
+            result += `<li>葡萄糖：${glucoseConcentration.toFixed(1)} mmol/L</li>`;
+            result += `</ul>`;
+
+            contentEl.innerHTML = result;
+            resultEl.style.display = 'block';
+        }
+
+        function resetReplacement() {
+            document.getElementById('nacl-09').value = '';
+            document.getElementById('water').value = '';
+            document.getElementById('kcl-10').value = '';
+            document.getElementById('nacl-10').value = '';
+            document.getElementById('nahco3-5').value = '';
+            document.getElementById('ca-gluconate-10').value = '';
+            document.getElementById('mgso4-25').value = '';
+            document.getElementById('glucose-50').value = '';
+            document.getElementById('replacement-result').style.display = 'none';
+        }
+
+        // 功能三：CRRT处方参数计算
+        function calculateCRRTParams() {
+            const bloodFlow = getInputValue('blood-flow');
+            const preDilution = getInputValue('pre-dilution') || 0;
+            const postDilution = getInputValue('post-dilution') || 0;
+            const fluidBalance = getInputValue('fluid-balance') || 0;
+            const hct = getInputValue('hct');
+            const weight = getInputValue('weight');
+            const resultEl = document.getElementById('crrt-params-result');
+            const contentEl = document.getElementById('crrt-params-result-content');
+
+            if (!bloodFlow || !hct || !weight) {
+                contentEl.innerHTML = '请完善血流速、红细胞压积和体重参数！';
+                resultEl.style.display = 'block';
+                return;
+            }
+
+            let ufr, ff;
+            const plasmaFlow = bloodFlow * (1 - hct / 100);
+
+            if (preDilution === 0) {
+                const netUltrafiltration = postDilution - fluidBalance;
+                ufr = netUltrafiltration / weight;
+                ff = (netUltrafiltration) / (plasmaFlow * 60) * 100;
+            } else {
+                const A = plasmaFlow / (plasmaFlow + preDilution / 60);
+                const netUltrafiltration = preDilution + postDilution - fluidBalance;
+                ufr = (A * netUltrafiltration) / weight;
+                ff = (postDilution - fluidBalance) / (plasmaFlow * 60) * 100;
+            }
+
+            let result = `<p><strong>超滤率（UFR）：${ufr.toFixed(2)} ml/kg/h</strong></p>`;
+            result += `<p><strong>滤过分数（FF）：${ff.toFixed(1)}%</strong></p>`;
+            result += `<p>参考标准：肾脏替代UFR 20-25ml/kg/h，重症30-35ml/kg/h，重症感染40ml/kg/h，FF＜30%</p>`;
+            if (ff >= 30) {
+                result += `<p style="color: #e74c3c; font-weight: bold;">⚠️ 警告：滤过分数≥30%，建议调整处方！</p>`;
+            }
+
+            contentEl.innerHTML = result;
+            resultEl.style.display = 'block';
+        }
+
+        function resetCRRTParams() {
+            document.getElementById('crrt-mode').value = '';
+            document.getElementById('blood-flow').value = '';
+            document.getElementById('pre-dilution').value = '';
+            document.getElementById('post-dilution').value = '';
+            document.getElementById('dialysate-flow').value = '';
+            document.getElementById('fluid-balance').value = '';
+            document.getElementById('crrt-params-result').style.display = 'none';
+        }
+
+        // 功能四：CRRT处方优化计算
+        function optimizeCRRT() {
+            const targetUFR = getInputValue('target-ufr');
+            const totalReplacement = getInputValue('total-replacement');
+            const bloodFlowOpt = getInputValue('blood-flow-opt');
+            const fluidBalanceOpt = getInputValue('fluid-balance-opt') || 0;
+            const hct = getInputValue('hct');
+            const weight = getInputValue('weight');
+            const resultEl = document.getElementById('optimize-result');
+            const contentEl = document.getElementById('optimize-result-content');
+
+            if (!targetUFR || !totalReplacement || !bloodFlowOpt || !hct || !weight) {
+                contentEl.innerHTML = '请完善所有输入参数！';
+                resultEl.style.display = 'block';
+                return;
+            }
+
+            const plasmaFlow = bloodFlowOpt * (1 - hct / 100);
+           
+            const targetNetUF = targetUFR * weight;
+            let A = (targetUFR * weight) / (totalReplacement - fluidBalanceOpt); 
+            preDilutionOpt = (plasmaFlow / A - plasmaFlow) * 60; 
+            postDilutionOpt = totalReplacement - preDilutionOpt; 
+            ffOpt = (postDilutionOpt - fluidBalanceOpt) / (plasmaFlow * 60) * 100; 
+            const isReasonable = ffOpt < 30;
+
+            let result = `<p><strong>优化后处方：</strong></p>`;
+            result += `<ul>`;
+            result += `<li>前稀释用量：${preDilutionOpt.toFixed(0)} ml/h</li>`;
+            result += `<li>后稀释用量：${postDilutionOpt.toFixed(0)} ml/h</li>`;
+            result += `<li>滤过分数（FF）：${ffOpt.toFixed(1)}%</li>`;
+            result += `</ul>`;
+            result += isReasonable ? 
+                `<p style="color: #27ae60; font-weight: bold;">✅ 处方合理：FF＜30%，符合安全标准</p>` :
+                `<p style="color: #e74c3c; font-weight: bold;">❌ 处方不合理：FF≥30%，血液浓缩，滤器凝血风险大，建议调整血流速或置换液总量、增加前稀释比例！</p>`;
+
+            contentEl.innerHTML = result;
+            resultEl.style.display = 'block';
+        }
+
+        function resetOptimizeCRRT() {
+            document.getElementById('target-ufr').value = '';
+            document.getElementById('total-replacement').value = '';
+            document.getElementById('blood-flow-opt').value = '';
+            document.getElementById('fluid-balance-opt').value = '';
+            document.getElementById('optimize-result').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
